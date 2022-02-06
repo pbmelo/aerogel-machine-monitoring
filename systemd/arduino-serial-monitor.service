@@ -1,0 +1,11 @@
+[Unit]
+Description=Reading serial output from Arduino and write them to the csv file to be used by the web-server
+
+[Service]
+# Command to execute when the service is started
+ExecStart=/usr/bin/python /home/pi/Documents/read_update_txt_python/update_temperatures.py
+User=pi
+Restart=on-failure
+RestartSec=5s
+[Install]
+WantedBy=multi-user.target

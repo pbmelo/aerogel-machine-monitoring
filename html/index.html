@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <!-- button works with 1.8.3 -->
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.js" ></script>
+  <!-- table works with both 1.8.3 and 2.1.3 -->
+  <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+		<!-- Load d3js v4. I'll later update this to v5 -->
+		<script type = "text/javascript" src = "https://d3js.org/d3.v4.min.js"></script>
+		<!--<script type = "text/javascript" src = "https://d3js.org/d3.v5.min.js"></script>-->
+  <title>Table with time, temperature, and pressures for aerogel drying machine</title>
+
+		<!-- Basic style for a line graph. Color will be determined for each plot with JS -->
+		<style> 
+			.line {
+				fill: none;
+				/*stroke: green;*/
+				stroke-width: 5px;
+			}
+		</style>
+
+<style>
+ /* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 90px;
+  height: 51px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 39px;
+  width: 39px;
+  left: 6px;
+  bottom: 6px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(39px);
+  -ms-transform: translateX(39px);
+  transform: translateX(39px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 51px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+</style>
+
+</head>
+
+<body>
+
+	<div id="current-status">
+	</div>
+
+	<div style="margin-left:100px;">
+<!-- Rounded switch -->
+<div style="line-height:60px;margin-bottom:30px;margin-top:30px;">
+<label class="switch" style="">
+  <input type="checkbox" name="valveswitch1" class="onoffswitch-checkbox" id="valveswitch1" />
+  <span class="slider round"></span>
+</label>
+<span style="font-size:30px;vertical-align: middle;">Toggle valve 1</span>
+</div>
+
+<!-- Rounded switch 2 -->
+<div style="line-height:60px;margin-bottom:30px;margin-top:30px;">
+<label class="switch" style="">
+  <input type="checkbox" name="valveswitch2" class="onoffswitch-checkbox" id="valveswitch2" unchecked />
+  <span class="slider round"></span>
+</label>
+<span style="font-size:30px;vertical-align: middle;">Toggle valve 2</span>
+</div>
+
+<!-- Rounded switch 3 -->
+<div style="line-height:60px;margin-top:30px">
+<label class="switch" style="">
+  <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked />
+  <span class="slider round"></span>
+</label>
+
+<!--<span id="tableview" class='tab'>Table view</span>&nbsp;<span class='tab' id="graphview" style='display:none'>No</span>-->
+<span style="font-size:30px;vertical-align: middle;">Table view (turn off for graph view)</span>
+</div>
+</div>
+
+  <div class="container" style="padding:0px 0px;">
+    <h1>Table with time, temperature, and pressures for aerogel drying machine</h1>
+	<div id="tablediv" class="well">
+		<!--<div class="row" id="csv-display" style="height:500px;overflow: scroll;">-->
+		<div class="row" id="csv-display">
+		</div>
+	</div>
+  </div>
+		<!-- div containing the graph to be drawn -->
+		<div id="TemperatureGraphplot" style="display:none;margin-left:100px;margin-top:0px"></div>
+</body>
+
+</html>
+
+<!-- script to write to table -->
+<script type="text/javascript">
+  $(document).ready(function(){
+	var data;
+	$.ajax({
+	  type: "GET",  
+	  url: "graphs/data.csv",
+	  dataType: "text",       
+	  success: function(response)  
+	  {
+		data = $.csv.toArrays(response);
+		generateHtmlTable(data);
+	  }   
+	});
+	
+	function generateHtmlTable(data) {
+		var html = '<table class="table table-condensed table-hover table-striped">';
+
+      if(typeof(data[0]) === 'undefined') {
+        return null;
+      } else {
+		$.each(data, function( index, row ) {
+		  //bind header
+		  if(index == 0) {
+			html += '<thead>';
+			html += '<tr>';
+			$.each(row, function( index, colData ) {
+				html += '<th>';
+				html += colData;
+				html += '</th>';
+			});
+			html += '</tr>';
+			html += '</thead>';
+			html += '<tbody>';
+		  } else {
+			html += '<tr>';
+			$.each(row, function( index, colData ) {
+				html += '<td>';
+				html += colData;
+				html += '</td>';
+			});
+			html += '</tr>';
+		  }
+		});
+		html += '</tbody>';
+		html += '</table>';
+		
+		$('#csv-display').append(html);
+	  }
+	}
+  });
+</script>
+
+<!-- draw graph script -->
+		<script>
+			var drawGraph = function() {
+				// Set the dimensions and margins of the graph
+				var margin = {top: 20, right: 50, bottom: 30, left: 50},
+					width = 960 - margin.left - margin.right,
+					height = 500 - margin.top - margin.bottom;
+
+				// Set the ranges
+				var x = d3.scaleTime().range([0, width]);
+				var y = d3.scaleLinear().range([height, 0]);
+				var y2 = d3.scaleLinear().range([height, 0]);
+
+				// Define the line
+				var firstline = d3.line()
+					.x(function(d) { return x(d.datetime); })
+					.y(function(d) { return y(d.temperature1); });
+
+				var secondline = d3.line()
+					.x(function(d) { return x(d.datetime); })
+					.y(function(d) { return y(d.temperature2); });
+
+				// Append the svg obgect to the body of the page
+				// Appends a 'group' element to 'svg'
+				// Moves the 'group' element to the top left margin
+				//var svg = d3.select("body").append("svg")
+				// Instead of appending to body, we will append to a div
+				var svg = d3.select("#TemperatureGraphplot").append("svg")
+					.attr("width", width + margin.left + margin.right)
+					.attr("height", height + margin.top + margin.bottom)
+					.append("g").attr("transform",
+						"translate(" + margin.left + "," + margin.top + ")");
+
+				// Write a function to parse time in correct format
+				var parseTime = d3.timeParse("%H:%M:%S");
+
+				// Get the data from file (v5)
+				// NOT WORKING
+				/*d3.csv("graphs/data.csv")
+				.then(function (data) {
+					data.forEach(function(d) {
+						//d.datetime = d.datetime;
+						d.datetime = parseTime(d.datetime);
+						d.temperature1 = +d.temperature1;
+						d.temperature2 = +d.temperature2;
+					})
+					.catch(function(error) {
+						throw error;
+					});*/
+
+				// Get the data from file (v4)
+				d3.csv("graphs/data.csv", function(error, data) {
+					if (error) throw error;
+					// Format the data
+					data.forEach(function(d) {
+						//d.datetime = d.datetime;
+						d.datetime = parseTime(d.datetime);
+						d.temperature1 = +d.temperature1;
+						d.temperature2 = +d.temperature2;
+					});
+
+					function smallest(a, b) {
+						if(a < b) return a;
+						else return b;
+					}
+					function largest(a, b) {
+						if(a > b) return a;
+						else return b;
+					}
+
+					var y_min1 = d3.min(data, function(d) { return d.temperature2;});
+					var y_min2 = d3.min(data, function(d) { return d.temperature1;});
+					var y_max1 = d3.max(data, function(d) { return d.temperature1;});
+					var y_max2 = d3.max(data, function(d) { return d.temperature2;});
+
+					var y_lower_range = smallest(y_min1,y_min2);
+					var y_upper_range = largest(y_max1,y_max2);
+					// Scale the range of the data
+					// x will be the whole range of the data
+					x.domain(d3.extent(data, function(d) { return d.datetime; }));
+					// y domain can be set in two ways: one axis for each graph, or the autoscale for both
+					// the syntax is y.domain(array with two values containing min and max);
+					//y.domain([13,20]);
+					// For a single data set, we can use d3.extent to return an array with the extent of data
+					//y.domain(d3.extent(data, function(d) { return d.temperature1; }));
+					// For two data sets with two axes, we should calculate the domain of both
+					//y2.domain(d3.extent(data, function(d) { return d.temperature2; }));
+					// But here we are going to calculate the extent depending on two data sets, so
+					y.domain([y_lower_range,y_upper_range]);
+
+					// Add the first line path.
+					svg.append("path")
+						.data([data])
+						.attr("stroke", "green")
+						.attr("class", "line")
+						.attr("d", firstline);
+
+					// Different styles for each lines
+					svg.append("path")
+						.data([data])
+						.attr("class", "line")
+						.attr("stroke", "blue")
+						.attr("d", secondline);
+
+					// Add the X Axis
+					//svg.append("g")
+					//   .attr("transform", "translate(0," + height + ")")
+					//   .call(d3.axisBottom(x));
+					svg.append("g")
+						.attr("class", "axis")
+						.attr("transform", "translate(0," + height + ")")
+					// Format it as time values
+						.call(d3.axisBottom(x)
+							.tickFormat(d3.timeFormat("%H:%M:%S")))
+						.selectAll("text")
+						.style("text-anchor", "end")
+						.attr("dx", "-.8em")
+						.attr("dy", ".15em")
+						.attr("transform", "rotate(-15)");
+
+					// Add the Y axis
+					svg.append("g")
+						.call(d3.axisLeft(y));
+					// In case two Y axes are desired
+					//svg.append("g")
+					//	.attr("transform", "translate(" + width + " ,0)")
+					//	.call(d3.axisRight(y2));
+				});
+			}
+			// Draw the graph immediately after the script is called/page is loaded
+			drawGraph();
+
+		</script>
+
+		<script>
+			// Set the interval over which the graph will be redrawn (in miliseconds)
+			var milis_redraw_interval = 2000;
+			// Each 2 seconds draw the graph
+			var intervalId = setInterval(function() {
+				// Remove the old things
+				d3.selectAll('svg').remove();
+				// Call the function again
+				drawGraph();
+			}, milis_redraw_interval);
+		</script> 
+
+<script type="text/javascript">
+$('#myonoffswitch').click(function(){
+    $('.tab').hide();
+    if($('#myonoffswitch').attr('checked') == "checked")
+    {
+        $('#tableview').show();  
+        $('#TemperatureGraphplot').hide();
+        $('#tablediv').show();
+    }
+    else
+    {
+        $('#graphview').show();
+        $('#TemperatureGraphplot').show();
+        $('#tablediv').hide();
+    }
+//alert($('#myonoffswitch').attr('checked'));
+});
+</script> 
+
+<script type="text/javascript">
+$('#valveswitch1').click(function(){
+    $('.tab').hide();
+    if($('#valveswitch1').attr('checked') == "checked")
+    {
+	    $.ajax({
+		    url:"valve1_on.php"
+	    });
+    }
+    else
+	    $.ajax({
+		    url:"valve1_off.php"
+	    });
+    {
+	//alert($('#ledswitch').attr('unchecked'));
+    }
+	    //window.setTimeout(50);
+//alert($('#ledswitch').attr('checked'));
+});
+</script> 
+
+<script type="text/javascript">
+$('#valveswitch2').click(function(){
+    $('.tab').hide();
+    if($('#valveswitch2').attr('checked') == "checked")
+    {
+	    $.ajax({
+		    url:"valve2_on.php"
+	    });
+    }
+    else
+	    $.ajax({
+		    url:"valve2_off.php"
+	    });
+    {
+	//alert($('#ledswitch').attr('unchecked'));
+    }
+//alert($('#ledswitch').attr('checked'));
+});
+</script> 
+
+<!--
+	<script>
+		$(window).on('load', function(){
+			$('#myonoffswitch').attr('checked','true');
+		});
+	</script>
+	-->
+	<!--
+	<script>
+		$(window).on('load', function(){
+			$('#valveswitch1').attr('checked','true');
+		});
+	</script>
+
+	<script>
+		$(window).on('load', function(){
+			$('#valveswitch2').attr('checked','true');
+		});
+	</script>
+	-->
+
+	<!--
+	<script>
+
+		$(window).on('load', function(){
+		var data;
+		$.ajax({
+		  type: "GET",  
+		  url: "graphs/data.csv",
+		  dataType: "text",       
+		  success: function(response)  
+		  {
+			data = $.csv.toArrays(response);
+			//console.log(data[data.length-1]);
+			checkboxonload(data);
+		  }
+		});
+
+	function checkboxonload(data) {
+		console.log("entering checkbox onload");
+		//$('input[type=checkbox]').removeAttr('checked');
+		//$('input[type=checkbox]').removeAttr('checked');
+      if(typeof(data[0]) === 'undefined') {
+        return null;
+      } else {
+	      if (data[data.length-1][8] == 1) {
+		console.log("1 true");
+		$('#valveswitch1').attr('checked','true');
+	      } else {
+		console.log("1 false");
+		$('#valveswitch1').removeAttr('checked');
+	      };
+	      if (data[data.length-1][9] == 1) {
+		console.log("2 true");
+		$('#valveswitch2').attr('checked','true');
+	      } else {
+		console.log("2 false");
+		$('#valveswitch2').removeAttr('checked');
+	      };
+      };
+	};
+		});
+	</script>
+	-->
+	<script>
+				redrawTable();
+			// Set the interval over which the graph will be redrawn (in miliseconds)
+			var milis_redraw_interval = 50;
+			// Each 2 seconds draw the graph
+			var intervalId = setInterval(function() {
+				redrawTable();
+		}, milis_redraw_interval); 
+	function redrawTable(){
+	$(document).ready(function(){
+		var data;
+		$.ajax({
+		  type: "GET",  
+		  url: "graphs/data.csv",
+		  dataType: "text",       
+		  success: function(response)  
+		  {
+			data = $.csv.toArrays(response);
+			//console.log(data[data.length-1]);
+			realtimetable(data);
+		  }
+		});
+	function realtimetable(data) {
+		//var html = '<table class="table table-condensed table-hover table-striped">';
+		var html = '<table style="margin:auto;margin-top:25px;font-size:30px;border-collapse:separate;border-spacing:50px 0;">';
+
+      if(typeof(data[0]) === 'undefined') {
+        return null;
+      } else {
+		html += '<tr>';
+		html += '<th>Time</th>';
+		html += '<th>T<sub>1</sub></th>';
+		html += '<th>T<sub>2</sub></th>';
+		html += '<th>T<sub>3</sub></th>';
+		html += '<th>T<sub>4</sub></th>';
+		html += '<th>P<sub>1</sub></th>';
+		html += '<th>P<sub>2</sub></th>';
+		html += '<th>P<sub>3</sub></th>';
+		html += '<th>Y<sub>1</sub></th>';
+		html += '<th>Y<sub>2</sub></th>';
+		html += '</tr>';
+		html += '<tr>';
+		html += '<td>';
+		html += data[data.length-1][0];
+		html += '</td>';
+		html += '<td>';
+		if (data[data.length-1][3] > 1300) {
+			html += '?';
+		} else {
+			html += data[data.length-1][1];
+		};
+		html += '</td>';
+		html += '<td>';
+		if (data[data.length-1][2] > 1300) {
+			html += '?';
+		} else {
+			html += data[data.length-1][2];
+		};
+		html += '</td>';
+		html += '<td>';
+		if (data[data.length-1][3] > 1300) {
+			html += '?';
+		} else {
+			html += data[data.length-1][3];
+		};
+		html += '</td>';
+		html += '<td>';
+		if (data[data.length-1][4] > 1300) {
+			html += '?';
+		} else {
+			html += data[data.length-1][4];
+		};
+		html += '</td>';
+		html += '<td>';
+		if (data[data.length-1][5] < 10) {
+			html += '?';
+		} else {
+			html += data[data.length-1][5];
+		};
+		html += '</td>';
+		html += '<td>';
+		if (data[data.length-1][6] < 10) {
+			html += '?';
+		} else {
+			html += data[data.length-1][6];
+		};
+		html += '</td>';
+		html += '<td>';
+		if (data[data.length-1][7] < 10) {
+			html += '?';
+		} else {
+			html += data[data.length-1][7];
+		};
+		html += '</td>';
+		html += '<td>';
+		if (data[data.length-1][8] == 1) {
+			html += 'ON';
+			$('#valveswitch1').attr('checked','true');
+		} else {
+			html += 'OFF';
+			$('#valveswitch1').removeAttr('checked');
+		};
+		html += '</td>';
+		html += '<td>';
+		if (data[data.length-1][9] == 1) {
+			html += 'ON';
+			$('#valveswitch2').attr('checked','true');
+		} else {
+			html += 'OFF';
+			$('#valveswitch2').removeAttr('checked');
+		}; 
+		html += '</td>';
+		html += '</tr>';
+		html += '</table>';
+
+		//console.log(data[data.length-1]);
+		$('#current-status').empty();
+		$('#current-status').append(html);
+	  }
+	}
+		});
+	};
+
+	</script>
