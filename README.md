@@ -48,6 +48,7 @@ My future plans consist of
    them to disk
 4. Upload pictures of the web interface as well as printed circuit, together
    with a short usage manual (it's all very intuitive, really!)
+5. Design and upload a 3D printed case for the whole system
 
 ## LICENSE
 
