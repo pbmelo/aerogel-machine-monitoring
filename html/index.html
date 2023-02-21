@@ -27,8 +27,8 @@
 .switch {
   position: relative;
   display: inline-block;
-  width: 90px;
-  height: 51px;
+  width: 180px;
+  height: 102px;
 }
 
 /* Hide default HTML checkbox */
@@ -54,10 +54,10 @@
 .slider:before {
   position: absolute;
   content: "";
-  height: 39px;
-  width: 39px;
-  left: 6px;
-  bottom: 6px;
+  height: 80px;
+  width: 80px;
+  left: 12px;
+  bottom: 12px;
   background-color: white;
   -webkit-transition: .4s;
   transition: .4s;
@@ -72,14 +72,14 @@ input:focus + .slider {
 }
 
 input:checked + .slider:before {
-  -webkit-transform: translateX(39px);
-  -ms-transform: translateX(39px);
-  transform: translateX(39px);
+  -webkit-transform: translateX(80px);
+  -ms-transform: translateX(80px);
+  transform: translateX(80px);
 }
 
 /* Rounded sliders */
 .slider.round {
-  border-radius: 51px;
+  border-radius: 102px;
 }
 
 .slider.round:before {
@@ -91,50 +91,114 @@ input:checked + .slider:before {
 
 <body>
 
-	<div id="current-status">
+	<div id="current-status"></div>
+
+	<div style="display:flex;justify-content:center;width:800px;margin:auto;margin-top:40px;">
+		<div style="line-height:102px;margin-bottom:30px;margin-top:30px;">
+			<!-- Rounded switch -->
+			<span>
+				<label class="switch" style="">
+					<input type="checkbox" name="valveswitch1" class="onoffswitch-checkbox" id="valveswitch1" />
+					<span class="slider round"></span>
+				</label>
+				<span style="font-size:45px;vertical-align: middle;">Toggle Y1</span>
+			</span>
+
+			<!-- Rounded switch 2 -->
+			<span>
+				<label class="switch" style="">
+					<input type="checkbox" name="valveswitch2" class="onoffswitch-checkbox" id="valveswitch2" unchecked />
+					<span class="slider round"></span>
+				</label>
+				<span style="font-size:45px;vertical-align: middle;">Toggle Y2</span>
+			</span>
+		</div>
+
+		<div style="line-height:102px;margin-bottom:30px;margin-top:30px;">
+			<!-- Rounded switch 3 -->
+			<span>
+				<label class="switch" style="">
+					<input type="checkbox" name="valveswitch3" class="onoffswitch-checkbox" id="valveswitch3" />
+					<span class="slider round"></span>
+				</label>
+				<span style="font-size:45px;vertical-align: middle;">Toggle Y3</span>
+			</span>
+
+			<!-- Rounded switch 4 -->
+			<span>
+				<label class="switch" style="">
+					<input type="checkbox" name="valveswitch4" class="onoffswitch-checkbox" id="valveswitch4" unchecked />
+					<span class="slider round"></span>
+				</label>
+				<span style="font-size:45px;vertical-align: middle;">Toggle Y4</span>
+			</span> 
+		</div>
+
 	</div>
 
-	<div style="margin-left:100px;">
-<!-- Rounded switch -->
-<div style="line-height:60px;margin-bottom:30px;margin-top:30px;">
-<label class="switch" style="">
-  <input type="checkbox" name="valveswitch1" class="onoffswitch-checkbox" id="valveswitch1" />
-  <span class="slider round"></span>
-</label>
-<span style="font-size:30px;vertical-align: middle;">Toggle valve 1</span>
-</div>
-
-<!-- Rounded switch 2 -->
-<div style="line-height:60px;margin-bottom:30px;margin-top:30px;">
-<label class="switch" style="">
-  <input type="checkbox" name="valveswitch2" class="onoffswitch-checkbox" id="valveswitch2" unchecked />
-  <span class="slider round"></span>
-</label>
-<span style="font-size:30px;vertical-align: middle;">Toggle valve 2</span>
-</div>
-
-<!-- Rounded switch 3 -->
-<div style="line-height:60px;margin-top:30px">
-<label class="switch" style="">
-  <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked />
-  <span class="slider round"></span>
-</label>
-
-<!--<span id="tableview" class='tab'>Table view</span>&nbsp;<span class='tab' id="graphview" style='display:none'>No</span>-->
-<span style="font-size:30px;vertical-align: middle;">Table view (turn off for graph view)</span>
-</div>
-</div>
-
-  <div class="container" style="padding:0px 0px;">
-    <h1>Table with time, temperature, and pressures for aerogel drying machine</h1>
-	<div id="tablediv" class="well">
-		<!--<div class="row" id="csv-display" style="height:500px;overflow: scroll;">-->
-		<div class="row" id="csv-display">
+	<div style="display:flex;justify-content:center;width:800px;margin:auto;margin-top:40px;">
+		<div style="line-height:102px;margin-bottom:30px;margin-top:30px;">
+			<!-- Rounded switch 5 -->
+			<span>
+				<label class="switch" style="">
+				<input type="checkbox" name="switch5" class="onoffswitch-checkbox" id="switch5" unchecked />
+				<span class="slider round"></span>
+				</label>
+				<span style="font-size:45px;vertical-align: middle;">Safe mode (experimental)</span>
+			</span>
 		</div>
 	</div>
-  </div>
+
+	<div style="width:800px;margin:auto;margin-top:40px;font-weight:bold;">
+		<span style="font-size:45px;">Cheat Sheet:</span>
+	</div>
+
+	<table style="margin:auto;margin-top:25px;font-size:45px;border-collapse:separate;border-spacing:50px 0;">
+		<tr>
+			<th>T<sub>1</sub></th>
+			<th>T<sub>2</sub></th>
+			<th>T<sub>3</sub></th>
+			<th>T<sub>4</sub></th>
+			<th>T<sub>5</sub></th>
+		</tr>
+		<tr>
+			<td>20 l</td>
+			<td>Pump</td>
+			<td>Left Chill</td>
+			<td>5 l</td>
+			<td>X</td>
+		</tr>
+		<tr>
+			<th>P<sub>1</sub></th>
+			<th>P<sub>2</sub></th>
+			<th>P<sub>3</sub></th>
+			<th>P<sub>4</sub></th>
+			<th>P<sub>5</sub></th>
+		</tr>
+		<tr>
+			<td>F Line</td>
+			<td>20 l</td>
+			<td>35 l</td>
+			<td>5 l</td>
+			<td>Pump</td>
+		</tr>
+		<tr>
+			<th>Y<sub>1</sub></th>
+			<th>Y<sub>2</sub></th>
+			<th>Y<sub>3</sub></th>
+			<th>Y<sub>4</sub></th>
+		</tr>
+		<tr>
+			<td>Pump</td>
+			<td>-</td>
+			<td>-</td>
+			<td>-</td>
+		</tr>
+	</table>
+
 		<!-- div containing the graph to be drawn -->
-		<div id="TemperatureGraphplot" style="display:none;margin-left:100px;margin-top:0px"></div>
+		<!--<div id="TemperatureGraphplot" style="display:none;margin-left:100px;margin-top:0px"></div>-->
+
 </body>
 
 </html>
@@ -398,6 +462,48 @@ $('#valveswitch2').click(function(){
 });
 </script> 
 
+<script type="text/javascript">
+$('#valveswitch3').click(function(){
+    $('.tab').hide();
+    if($('#valveswitch3').attr('checked') == "checked")
+    {
+	    $.ajax({
+		    url:"valve3_on.php"
+	    });
+    }
+    else
+	    $.ajax({
+		    url:"valve3_off.php"
+	    });
+    {
+	//alert($('#ledswitch').attr('unchecked'));
+    }
+	    //window.setTimeout(50);
+//alert($('#ledswitch').attr('checked'));
+});
+</script> 
+
+<script type="text/javascript">
+$('#valveswitch4').click(function(){
+    $('.tab').hide();
+    if($('#valveswitch4').attr('checked') == "checked")
+    {
+	    $.ajax({
+		    url:"valve4_on.php"
+	    });
+    }
+    else
+	    $.ajax({
+		    url:"valve4_off.php"
+	    });
+    {
+	//alert($('#ledswitch').attr('unchecked'));
+    }
+	    //window.setTimeout(50);
+//alert($('#ledswitch').attr('checked'));
+});
+</script> 
+
 <!--
 	<script>
 		$(window).on('load', function(){
@@ -464,7 +570,7 @@ $('#valveswitch2').click(function(){
 	-->
 	<script>
 				redrawTable();
-			// Set the interval over which the graph will be redrawn (in miliseconds)
+			// Set the interval over which the table will be redrawn (in miliseconds)
 			var milis_redraw_interval = 50;
 			// Each 2 seconds draw the graph
 			var intervalId = setInterval(function() {
@@ -486,29 +592,29 @@ $('#valveswitch2').click(function(){
 		});
 	function realtimetable(data) {
 		//var html = '<table class="table table-condensed table-hover table-striped">';
-		var html = '<table style="margin:auto;margin-top:25px;font-size:30px;border-collapse:separate;border-spacing:50px 0;">';
+		var html = '<table style="margin:auto;margin-top:25px;font-size:45px;border-collapse:separate;border-spacing:50px 0;">';
 
       if(typeof(data[0]) === 'undefined') {
         return null;
       } else {
 		html += '<tr>';
 		html += '<th>Time</th>';
-		html += '<th>T<sub>1</sub></th>';
-		html += '<th>T<sub>2</sub></th>';
-		html += '<th>T<sub>3</sub></th>';
-		html += '<th>T<sub>4</sub></th>';
-		html += '<th>P<sub>1</sub></th>';
-		html += '<th>P<sub>2</sub></th>';
-		html += '<th>P<sub>3</sub></th>';
-		html += '<th>Y<sub>1</sub></th>';
-		html += '<th>Y<sub>2</sub></th>';
 		html += '</tr>';
 		html += '<tr>';
 		html += '<td>';
 		html += data[data.length-1][0];
 		html += '</td>';
+		html += '</tr>';
+		html += '<tr>';
+		html += '<th>T<sub>1</sub></th>';
+		html += '<th>T<sub>2</sub></th>';
+		html += '<th>T<sub>3</sub></th>';
+		html += '<th>T<sub>4</sub></th>';
+		html += '<th>T<sub>5</sub></th>';
+		html += '</tr>';
+		html += '<tr>';
 		html += '<td>';
-		if (data[data.length-1][3] > 1300) {
+		if (data[data.length-1][1] > 1300) {
 			html += '?';
 		} else {
 			html += data[data.length-1][1];
@@ -536,12 +642,19 @@ $('#valveswitch2').click(function(){
 		};
 		html += '</td>';
 		html += '<td>';
-		if (data[data.length-1][5] < 10) {
+		if (data[data.length-1][5] > 1300) {
 			html += '?';
 		} else {
 			html += data[data.length-1][5];
 		};
 		html += '</td>';
+		html += '</tr>';
+		html += '<th>P<sub>1</sub></th>';
+		html += '<th>P<sub>2</sub></th>';
+		html += '<th>P<sub>3</sub></th>';
+		html += '<th>P<sub>4</sub></th>';
+		html += '<th>P<sub>5</sub></th>';
+		html += '<tr>';
 		html += '<td>';
 		if (data[data.length-1][6] < 10) {
 			html += '?';
@@ -557,7 +670,36 @@ $('#valveswitch2').click(function(){
 		};
 		html += '</td>';
 		html += '<td>';
-		if (data[data.length-1][8] == 1) {
+		if (data[data.length-1][8] < 10) {
+			html += '?';
+		} else {
+			html += data[data.length-1][8];
+		};
+		html += '</td>';
+		html += '<td>';
+		if (data[data.length-1][9] < 10) {
+			html += '?';
+		} else {
+			html += data[data.length-1][9];
+		};
+		html += '</td>';
+		html += '<td>';
+		if (data[data.length-1][10] < 10) {
+			html += '?';
+		} else {
+			html += data[data.length-1][10];
+		};
+		html += '</td>';
+		html += '</tr>';
+		html += '<tr>';
+		html += '<th>Y<sub>1</sub></th>';
+		html += '<th>Y<sub>2</sub></th>';
+		html += '<th>Y<sub>3</sub></th>';
+		html += '<th>Y<sub>4</sub></th>';
+		html += '</tr>';
+		html += '<tr>';
+		html += '<td>';
+		if (data[data.length-1][11] == 1) {
 			html += 'ON';
 			$('#valveswitch1').attr('checked','true');
 		} else {
@@ -566,7 +708,7 @@ $('#valveswitch2').click(function(){
 		};
 		html += '</td>';
 		html += '<td>';
-		if (data[data.length-1][9] == 1) {
+		if (data[data.length-1][12] == 1) {
 			html += 'ON';
 			$('#valveswitch2').attr('checked','true');
 		} else {
@@ -574,6 +716,32 @@ $('#valveswitch2').click(function(){
 			$('#valveswitch2').removeAttr('checked');
 		}; 
 		html += '</td>';
+		html += '<td>';
+		if (data[data.length-1][13] == 1) {
+			html += 'ON';
+			$('#valveswitch3').attr('checked','true');
+		} else {
+			html += 'OFF';
+			$('#valveswitch3').removeAttr('checked');
+		}; 
+		html += '</td>';
+		html += '<td>';
+	      	if (data[data.length-1][14] == 1) {
+			html += 'ON';
+			$('#valveswitch4').attr('checked','true');
+		} else {
+			html += 'OFF';
+			$('#valveswitch4').removeAttr('checked');
+		}; 
+		html += '</td>';
+		html += '<td>';
+//		if (data[data.length-1][14] == 1) {
+//			html += 'ON';
+//			$('#valveswitch2').attr('checked','true');
+//		} else {
+//			html += 'OFF';
+//			$('#valveswitch2').removeAttr('checked');
+//		}; 
 		html += '</tr>';
 		html += '</table>';
 

@@ -4,10 +4,11 @@
 #include <Adafruit_MAX31856.h>
 
 // Use software SPI: CS, DI, DO, CLK
-Adafruit_MAX31856 maxthermo = Adafruit_MAX31856(7, 11, 12, 13);
+Adafruit_MAX31856 maxthermo = Adafruit_MAX31856(10, 11, 12, 13);
 Adafruit_MAX31856 maxthermo2 = Adafruit_MAX31856(9, 11, 12, 13);
 Adafruit_MAX31856 maxthermo3 = Adafruit_MAX31856(8, 11, 12, 13);
-Adafruit_MAX31856 maxthermo4 = Adafruit_MAX31856(10, 11, 12, 13);
+Adafruit_MAX31856 maxthermo4 = Adafruit_MAX31856(7, 11, 12, 13);
+Adafruit_MAX31856 maxthermo5 = Adafruit_MAX31856(6, 11, 12, 13);
 //Adafruit_MAX31856 maxthermo = Adafruit_MAX31856(47, 32, 46, 32);
 //Adafruit_MAX31856 maxthermo4 = Adafruit_MAX31856(38, 36, 34, 32);
 //Adafruit_MAX31856 maxthermo3 = Adafruit_MAX31856(30, 28, 26, 24);
@@ -15,27 +16,36 @@ Adafruit_MAX31856 maxthermo4 = Adafruit_MAX31856(10, 11, 12, 13);
 // use hardware SPI, just pass in the CS pin
 /*Adafruit_MAX31856 maxthermo = Adafruit_MAX31856(10);*/
 
-double temp, temp2, temp3, temp4;
-double CJ_temp, CJ_temp2, CJ_temp3, CJ_temp4;
+double temp, temp2, temp3, temp4, temp5;
+double CJ_temp, CJ_temp2, CJ_temp3, CJ_temp4, CJ_temp5;
 
 char strBuf[150];
 
 //int led = 43;
 int relay1 = 2;
 int relay2 = 3;
+int relay3 = 4;
+int relay4 = 5;
+
 String sdata="";
 
 int pressure_sensor1=A0;
-int pressure_sensor2=A6;
+int pressure_sensor2=A1;
 int pressure_sensor3=A2;
+int pressure_sensor4=A3;
+int pressure_sensor5=A4;
 
-int pressure_output1, pressure_output2, pressure_output3;
-int actual_pressure1, actual_pressure2, actual_pressure3;
+int pressure_output1, pressure_output2, pressure_output3, pressure_output4, pressure_output5;
+int actual_pressure1, actual_pressure2, actual_pressure3, actual_pressure4, actual_pressure5;
 
-int valve1status, valve2status;
+int valve1status=0, valve2status=0, valve3status=0, valve4status=0;
+
+int safetystatus=0;
+const int safety_threshold=1350;
+const int lower_safety_threshold=1250;
 
 int get_pressure(int pressure_pin) {
-  int n_loop = 300;
+  int n_loop = 500;
   int i_loop;
   int analog_pressure_single;
   long analog_pressure_avg = 0;
@@ -101,8 +111,11 @@ int map_pressure(int analog_read) {
   }*/
 
   //For 150 ohms:
-  if (analog_read<209) {
-    actual_pressure = map(analog_read,0,209,0,654);
+  if (analog_read<111) {
+    actual_pressure = map(analog_read,0,111,0,15);
+    //actual_pressure = analog_float*654/209;
+  } else if (analog_read<209) {
+    actual_pressure = map(analog_read,111,209,15,654);
     //actual_pressure = analog_float*654/209;
   } else if (analog_read<216) {
     actual_pressure = map(analog_read,209,216,654,705);
@@ -296,15 +309,36 @@ void setup() {
     default: Serial.println("Unknown"); break;
   }
 
+  Serial.print("Thermocouple 5 type: ");
+  switch (maxthermo4.getThermocoupleType() ) {
+    case MAX31856_TCTYPE_B: Serial.println("B Type"); break;
+    case MAX31856_TCTYPE_E: Serial.println("E Type"); break;
+    case MAX31856_TCTYPE_J: Serial.println("J Type"); break;
+    case MAX31856_TCTYPE_K: Serial.println("K Type"); break;
+    case MAX31856_TCTYPE_N: Serial.println("N Type"); break;
+    case MAX31856_TCTYPE_R: Serial.println("R Type"); break;
+    case MAX31856_TCTYPE_S: Serial.println("S Type"); break;
+    case MAX31856_TCTYPE_T: Serial.println("T Type"); break;
+    case MAX31856_VMODE_G8: Serial.println("Voltage x8 Gain mode"); break;
+    case MAX31856_VMODE_G32: Serial.println("Voltage x8 Gain mode"); break;
+    default: Serial.println("Unknown"); break;
+  }
+
   pinMode(relay1,OUTPUT);
   pinMode(relay2,OUTPUT);
+  pinMode(relay3,OUTPUT);
+  pinMode(relay4,OUTPUT);
   pinMode(pressure_sensor1,INPUT);
   pinMode(pressure_sensor2,INPUT);
   pinMode(pressure_sensor3,INPUT);
+  pinMode(pressure_sensor4,INPUT);
+  pinMode(pressure_sensor5,INPUT);
 
 // switch relays off
   digitalWrite(relay1,LOW);
   digitalWrite(relay2,LOW);
+  digitalWrite(relay3,LOW);
+  digitalWrite(relay4,LOW);
 
 }
 
@@ -354,16 +388,28 @@ void loop() {
   //Serial.println(maxthermo2.readThermocoupleTemperature());
   temp4 = maxthermo4.readThermocoupleTemperature();
 
+  //Serial.print("Cold Junction 4 Temp: ");
+  //Serial.println(maxthermo2.readCJTemperature());
+  CJ_temp5 = maxthermo5.readCJTemperature();
+
+  //Serial.print("Thermocouple 4 Temp: ");
+  //Serial.println(maxthermo2.readThermocoupleTemperature());
+  temp5 = maxthermo5.readThermocoupleTemperature();
+
 //Read pressure
   pressure_output1 = get_pressure(pressure_sensor1);
   pressure_output2 = get_pressure(pressure_sensor2);
   pressure_output3 = get_pressure(pressure_sensor3);
+  pressure_output4 = get_pressure(pressure_sensor4);
+  pressure_output5 = get_pressure(pressure_sensor5);
 //Map pressure
   actual_pressure1 = map_pressure(pressure_output1);
   actual_pressure2 = map_pressure(pressure_output2);
   actual_pressure3 = map_pressure(pressure_output3);
+  actual_pressure4 = map_pressure(pressure_output4);
+  actual_pressure5 = map_pressure(pressure_output5);
 
-  Serial.print("Sensor outputs (T1,T2,T3,T4,P1,P2,P3,Y1,Y2): ");
+  Serial.print("Sensor outputs (T1,T2,T3,T4,T5,P1,P2,P3,P4,P5,Y1,Y2,Y3,Y4): ");
   Serial.print(temp);
   Serial.print(" ");
   Serial.print(temp2);
@@ -371,6 +417,8 @@ void loop() {
   Serial.print(temp3);
   Serial.print(" ");
   Serial.print(temp4);
+  Serial.print(" ");
+  Serial.print(temp5);
   Serial.print(" ");
   //Serial.print(pressure_output1);
   //Serial.print("/");
@@ -384,12 +432,36 @@ void loop() {
   //Serial.print("/");
   Serial.print(actual_pressure3);
   Serial.print(" ");
+  //Serial.print(pressure_output4);
+  //Serial.print("/");
+  Serial.print(actual_pressure4);
+  Serial.print(" ");
+  //Serial.print(pressure_output5);
+  //Serial.print("/");
+  Serial.print(actual_pressure5);
+  Serial.print(" ");
   Serial.print(valve1status);
   Serial.print(" ");
-  Serial.println(valve2status);
+  Serial.print(valve2status);
+  Serial.print(" ");
+  Serial.print(valve3status);
+  Serial.print(" ");
+  Serial.print(valve4status);
+  Serial.print(" ");
+  Serial.println(safetystatus);
 
   //sprintf(strBuf, "Temperatures: %f %f\n", temp, temp2);
   //Serial.print(strBuf);
+
+  if (safetystatus) {
+    if (actual_pressure5 > safety_threshold) {
+      valve1status = 0;
+      digitalWrite(relay1,LOW);
+    } else if (actual_pressure5 < lower_safety_threshold) { 
+      valve1status = 1;
+      digitalWrite(relay1,HIGH);
+    }
+  }
 
   // listen to serial input and act accordingly
   byte ch;
@@ -399,9 +471,22 @@ void loop() {
     sdata.trim();
     // Process command in sdata.
     switch( sdata.charAt(0) ) {
+      case 'p':
+        safetystatus = 1;
+        break;
+      case 'q':
+        safetystatus = 0;
+        break;
       case 's':
-        valve1status = 1;
-        digitalWrite(relay1,HIGH);
+        if (safetystatus) {
+          if (actual_pressure5 < safety_threshold) {
+            valve1status = 1;
+            digitalWrite(relay1,HIGH);
+          }
+        } else {
+            valve1status = 1;
+            digitalWrite(relay1,HIGH);
+        }
         break;
       case 't':
         valve1status = 0;
@@ -415,11 +500,27 @@ void loop() {
         valve2status = 0;
         digitalWrite(relay2,LOW);
         break;
+      case 'e':
+        valve3status = 1;
+        digitalWrite(relay3,HIGH);
+        break;
+      case 'l':
+        valve3status = 0;
+        digitalWrite(relay3,LOW);
+        break;
+      case 'c':
+        valve4status = 1;
+        digitalWrite(relay4,HIGH);
+        break;
+      case 'o':
+        valve4status = 0;
+        digitalWrite(relay4,LOW);
+        break;
      //default: Serial.println(sdata);
     }
     sdata = ""; // Clear the string ready for the next command.
   }
 
-  delay(100);
+  delay(500);
 
 }
