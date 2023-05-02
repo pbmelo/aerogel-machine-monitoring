@@ -53,6 +53,7 @@ My future plans consist of
 ### Images
 
 Here's how the system looks after being soldered and assembled
+
 ![Photo of the assembled system] (https://github.com/pbmelo/aerogel-machine-monitoring/blob/main/screenshots/mounted-module.png?raw=true)
 
 ## LICENSE
