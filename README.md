@@ -50,6 +50,11 @@ My future plans consist of
    with a short usage manual (it's all very intuitive, really!)
 5. Design and upload a 3D printed case for the whole system
 
+### Images
+
+Here's how the system looks after being soldered and assembled
+![Photo of the assembled system] (https://github.com/pbmelo/aerogel-machine-monitoring/blob/main/screenshots/mounted-module.png?raw=true)
+
 ## LICENSE
 
 Copyright (C) 2022 pbmelo
