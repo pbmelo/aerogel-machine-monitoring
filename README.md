@@ -1,8 +1,7 @@
 # aerogel-machine-monitoring
 
 This repository is meant to be a place where I'm able to control and keep my
-files for a remote monitoring system I have developed for an aerogel machine in
-the lab [I currently work on](https://www.colorado.edu/soft-matter-physics/).
+files for a remote monitoring system I have developed for a critical point drying machine.
 
 ## Note
 
